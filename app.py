@@ -566,8 +566,8 @@ def render_gatic_40() -> None:
     ]
     cards_linha_2 = [
         (res4, "Novo Vencimento (5,05%)", resultado.novo_vencimento if resultado else None, "retro-card retro-card--row2"),
-        (res5, "Remuneração Bruta", resultado.remuneracao_bruta if resultado else None, "retro-card retro-card--row2"),
-        (res6, "GATIC 40%", gatic_valor, "retro-card retro-card--row2"),
+        (res5, "GATIC 40%", gatic_valor, "retro-card retro-card--row2"),
+        (res6, "Remuneração Bruta", resultado.remuneracao_bruta if resultado else None, "retro-card retro-card--row2"),
         (
             res7,
             "Remuneração Líquida",
