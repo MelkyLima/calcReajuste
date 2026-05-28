@@ -455,6 +455,8 @@ def render_gatic_40() -> None:
     dados_base = obter_entrada_base()
     pensao_valor = dados_base.pensao_valor
     tem_pensao_pdf = pensao_valor > Decimal("0.00")
+    dependentes_irpf = int(dados_base.dependentes or 0)
+    pensao_valor = moeda(pensao_valor) or Decimal("0.00")
 
     if not tem_pensao_pdf:
         tem_pensao = st.radio(
@@ -487,48 +489,53 @@ def render_gatic_40() -> None:
     total_descontos = Decimal("0.00")
 
     if dados_base.vencimento:
-        if dados_base.itens:
-            total_proventos = totalizar_itens(dados_base.itens, "P")
-            total_descontos = totalizar_itens(dados_base.itens, "D")
-            geap_valor = totalizar_descontos_por_descricao(
-                dados_base.itens,
-                {"GEAP"},
-            )
-            desconto_irrf_atual = totalizar_descontos_por_descricao(
-                dados_base.itens,
-                {"IRRF"},
-            )
-            desconto_iper_atual = totalizar_descontos_por_descricao(
-                dados_base.itens,
-                {"IPER"},
-            )
-            descontos_gerais = (
-                total_descontos
-                - geap_valor
-                - dados_base.pensao_valor
-                - desconto_irrf_atual
-                - desconto_iper_atual
-            )
-            if descontos_gerais < Decimal("0.00"):
-                descontos_gerais = Decimal("0.00")
+        try:
+            if dados_base.itens:
+                total_proventos = totalizar_itens(dados_base.itens, "P")
+                total_descontos = totalizar_itens(dados_base.itens, "D")
+                geap_valor = totalizar_descontos_por_descricao(
+                    dados_base.itens,
+                    {"GEAP"},
+                )
+                desconto_irrf_atual = totalizar_descontos_por_descricao(
+                    dados_base.itens,
+                    {"IRRF"},
+                )
+                desconto_iper_atual = totalizar_descontos_por_descricao(
+                    dados_base.itens,
+                    {"IPER"},
+                )
+                descontos_gerais = (
+                    total_descontos
+                    - geap_valor
+                    - dados_base.pensao_valor
+                    - desconto_irrf_atual
+                    - desconto_iper_atual
+                )
+                if descontos_gerais < Decimal("0.00"):
+                    descontos_gerais = Decimal("0.00")
 
-            resultado = calcular_gatic(
-                dados_base.vencimento,
-                dados_base.dependentes,
-                pensao_valor,
-                total_proventos,
-                geap_valor,
-                descontos_gerais,
-            )
-        else:
-            resultado = calcular_gatic(
-                dados_base.vencimento,
-                dados_base.dependentes,
-                pensao_valor,
-                dados_base.vencimento,
-                Decimal("0.00"),
-                Decimal("0.00"),
-            )
+                resultado = calcular_gatic(
+                    dados_base.vencimento,
+                    dependentes_irpf,
+                    pensao_valor,
+                    total_proventos,
+                    geap_valor,
+                    descontos_gerais,
+                )
+            else:
+                resultado = calcular_gatic(
+                    dados_base.vencimento,
+                    dependentes_irpf,
+                    pensao_valor,
+                    dados_base.vencimento,
+                    Decimal("0.00"),
+                    Decimal("0.00"),
+                )
+        except Exception as erro:
+            st.error("Não foi possível calcular GATIC 40%. Verifique os dados e tente novamente.")
+            st.exception(erro)
+            return
 
     if resultado is not None:
         render_detalhes_calc_gatic(

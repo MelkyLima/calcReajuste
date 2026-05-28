@@ -269,20 +269,20 @@ def calcular_reposicao(
 
 
 def calcular_gatic(
-    vencimento_base: Decimal,
-    dependentes_irpf: int,
-    pensao_valor: Decimal,
-    total_proventos_atual: Decimal,
-    geap_valor: Decimal,
-    descontos_gerais_atual: Decimal,
+    vencimento_base: Decimal | float | int | None,
+    dependentes_irpf: int | None,
+    pensao_valor: Decimal | float | int | None,
+    total_proventos_atual: Decimal | float | int | None,
+    geap_valor: Decimal | float | int | None,
+    descontos_gerais_atual: Decimal | float | int | None,
 ) -> ResultadoGatic:
     return calcular_gatic_com_totais(
-        vencimento_base=vencimento_base,
-        dependentes_irpf=dependentes_irpf,
-        pensao_valor=pensao_valor,
-        total_proventos_atual=total_proventos_atual,
-        geap_valor=geap_valor,
-        descontos_gerais_atual=descontos_gerais_atual,
+        vencimento_base=moeda(vencimento_base) or Decimal("0.00"),
+        dependentes_irpf=int(dependentes_irpf or 0),
+        pensao_valor=moeda(pensao_valor) or Decimal("0.00"),
+        total_proventos_atual=moeda(total_proventos_atual) or Decimal("0.00"),
+        geap_valor=moeda(geap_valor) or Decimal("0.00"),
+        descontos_gerais_atual=moeda(descontos_gerais_atual) or Decimal("0.00"),
     )
 
 
